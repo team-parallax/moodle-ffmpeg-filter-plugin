@@ -82,6 +82,8 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
 
         $fs = get_file_storage();
         $inputfile = $fs->get_file_by_id($job->fileid);
+        // TODO: Get Extension
+        $source_format = pathinfo($inputfile->get_filename(), PATHINFO_EXTENSION);
 
         if (!$inputfile) {
             $job->status = FILTER_HTML5AVTOMP4_JOBSTATUS_FAILED;
@@ -105,6 +107,7 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
         $tmpoutputfilename = str_replace('.ogv', '.mp4', $tmpoutputfilename);
         $tmpoutputfilepath = $tempdir . DIRECTORY_SEPARATOR . $tmpoutputfilename;
 
+        $target_format = pathinfo($inputfile->get_filename(), PATHINFO_EXTENSION);
         $type = (strpos($tmpoutputfilename, '.m4a') !== false) ? 'audio' : 'video';
 
         $inputfileplaceholder_preg = preg_quote(FILTER_HTML5AVTOMP4_INPUTFILE_PLACEHOLDER, '/');
@@ -119,8 +122,15 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
             mtrace($command);
         }
 
+        // $request_body = array(
+        //     "conversionFile" => "@". $pathtoffmpeg,
+        //     "originalFormat" => $source_format,
+        //     "targetFormat" => $target_format
+        // );
         $output = null;
         $return = null;
+
+        //TODO: webservice connection 
         exec($command, $output, $return);
         if ($output) {
             mtrace($output);
