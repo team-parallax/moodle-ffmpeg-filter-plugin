@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021042301;
+$plugin->version = 2021042303;
 $plugin->requires = 2019052000; // Moodle 3.7
 $plugin->component = 'filter_avtomp4ffmpeg';
 

@@ -27,16 +27,36 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/filter/avtomp4ffmpeg/locallib.php');
 
-$settings->add(new admin_setting_configexecutable('filter_avtomp4ffmpeg/ffmpegwebserviceurl',get_string('ffmpegwebserviceurl','filter_avtomp4ffmpeg'),get_string('ffmpegwebserviceurl_desc','filter_avtomp4ffmpeg'),'/usr/bin/ffmpeg'));
+$settings->add(
+    new admin_setting_configtext(
+        'filter_avtomp4ffmpeg/ffmpegwebserviceurl',
+        get_string('ffmpegwebserviceurl', 'filter_avtomp4ffmpeg'),
+        get_string('ffmpegwebserviceurl_desc', 'filter_avtomp4ffmpeg'),
+        get_string('ffmpegwebserviceurldefault', 'filter_avtomp4ffmpeg')
+    )
+);
 
-$settings->add(new admin_setting_configtext('filter_avtomp4ffmpeg/ffmpegwebserviceurl', get_string('ffmpegwebserviceurl', 'filter_avtomp4ffmpeg'), get_string('ffmpegwebserviceurldefault', 'filter_avtomp4ffmpeg')));
+$settings->add(new admin_setting_configtext(
+    'filter_avtomp4ffmpeg/convertonlyexts',
+    get_string('convertonlyexts', 'filter_avtomp4ffmpeg'),
+    get_string('convertonlyexts_desc', 'filter_avtomp4ffmpeg'),
+    'ogg, ogv, webm'
+));
 
-$settings->add(new admin_setting_configtext('filter_avtomp4ffmpeg/convertonlyexts', get_string('convertonlyexts', 'filter_avtomp4ffmpeg'), get_string('convertonlyexts_desc', 'filter_avtomp4ffmpeg'), 'ogg, ogv, webm'));
+$settings->add(new admin_setting_configcheckbox(
+    'filter_avtomp4ffmpeg/convertaudio',
+    get_string('convertaudio', 'filter_avtomp4ffmpeg'),
+    get_string('convertaudio_desc', 'filter_avtomp4ffmpeg'),
+    true,
+    true,
+    false
+));
 
-$settings->add(new admin_setting_configcheckbox('filter_avtomp4ffmpeg/convertaudio', get_string('convertaudio', 'filter_avtomp4ffmpeg'), get_string('convertaudio_desc', 'filter_avtomp4ffmpeg'), true, true, false));
-
-$settings->add(new admin_setting_configtext('filter_avtomp4ffmpeg/audioffmpegsettings', get_string('audioffmpegsettings', 'filter_avtomp4ffmpeg'), get_string('audioffmpegsettings_desc', 'filter_avtomp4ffmpeg'), '-i ' . FILTER_AVTOMP4FFMPEG_INPUTFILE_PLACEHOLDER . ' ' . FILTER_AVTOMP4FFMPEG_OUTPUTFILE_PLACEHOLDER, PARAM_RAW, 80));
-
-$settings->add(new admin_setting_configcheckbox('filter_avtomp4ffmpeg/convertvideo', get_string('convertvideo', 'filter_avtomp4ffmpeg'), get_string('convertvideo_desc', 'filter_avtomp4ffmpeg'), true, true, false));
-
-$settings->add(new admin_setting_configtext('filter_avtomp4ffmpeg/videoffmpegsettings', get_string('videoffmpegsettings', 'filter_avtomp4ffmpeg'), get_string('videoffmpegsettings_desc', 'filter_avtomp4ffmpeg'), '-i ' . FILTER_AVTOMP4FFMPEG_INPUTFILE_PLACEHOLDER . ' ' . FILTER_AVTOMP4FFMPEG_OUTPUTFILE_PLACEHOLDER, PARAM_RAW, 80));
+$settings->add(new admin_setting_configcheckbox(
+    'filter_avtomp4ffmpeg/convertvideo',
+    get_string('convertvideo', 'filter_avtomp4ffmpeg'),
+    get_string('convertvideo_desc', 'filter_avtomp4ffmpeg'),
+    true,
+    true,
+    false
+));

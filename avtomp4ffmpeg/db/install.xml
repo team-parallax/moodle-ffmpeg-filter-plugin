@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="filter/html5avtomp4/db" VERSION="20190602" COMMENT="XMLDB file for Moodle filter/html5avtomp4"
+<XMLDB PATH="filter/avtomp4ffmpeg/db" VERSION="20190602" COMMENT="XMLDB file for Moodle filter/avtomp4ffmpeg"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
