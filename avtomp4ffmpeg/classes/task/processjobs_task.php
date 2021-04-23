@@ -18,17 +18,34 @@
 /**
  * Version information
  *
- * @package    filter_html5avtomp4
- * @copyright  2019 Université de Lausanne
- * @author     Nicolas.Dunand@unil.ch
+ * @package    filter_avtomp4ffmpeg
+ * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
+ 
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace filter_avtomp4ffmpeg\task;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2019112901;
-$plugin->requires = 2019052000; // Moodle 3.7
-$plugin->component = 'filter_html5avtomp4';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'Version 1.0 for Moodle 3.7-3.8 (Build: 2019112901)';
+class processjobs_task extends \core\task\scheduled_task {
 
+    /**
+     * Get a descriptive name for this task (shown to admins).
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('processjobs_task', 'filter_avtomp4ffmpeg');
+    }
+
+    /**
+     * Run the task
+     */
+    public function execute() {
+        global $CFG;
+        require_once($CFG->dirroot . '/filter/html5avtomp4/locallib.php');
+        \filter_avtomp4ffmpeg_processjobs();
+    }
+
+}

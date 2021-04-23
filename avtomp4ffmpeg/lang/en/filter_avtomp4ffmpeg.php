@@ -18,15 +18,15 @@
 /**
  * Version information
  *
- * @package    filter_html5avtomp4
- * @copyright  2019 Université de Lausanne
- * @author     Nicolas.Dunand@unil.ch
+ * @package    filter_avtomp4ffmpeg
+ * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['filtername'] = 'HTML5 audio/video to MP4 filter';
-$string['pathtoffmpeg'] = 'Path to ffmpeg';
-$string['pathtoffmpeg_desc'] = 'Path to the ffmpeg executable';
+$string['filtername'] = 'Ffmpeg-based audio/video to MP4 filter';
+$string['ffmpegwebserviceurl'] = 'Ffmpeg-Webservice URL';
+$string['ffmpegwebserviceurldefault'] = 'https://example-converterservice.com';
+$string['ffmpegwebserviceurl_desc'] = 'URL of the conversion service for ffmpeg';
 $string['convertaudio'] = 'Convert audio';
 $string['convertaudio_desc'] = 'Convert audio OGG files to MP4 (M4A)';
 $string['convertvideo'] = 'Convert video';
@@ -38,4 +38,4 @@ $string['videoffmpegsettings'] = 'ffmpeg settings for video conversion';
 $string['videoffmpegsettings_desc'] = 'This should contain at least "-i {%INPUTFILE%} {%OUTPUTFILE%}"; place your options around these as needed';
 $string['convertonlyexts'] = 'convert only these extensions';
 $string['convertonlyexts_desc'] = 'Comma-separated list of file extensions to be converted to mp4';
-$string['privacy:metadata'] = 'The HTML5 audio/video to MP4 filter does not store any personal data.';
+$string['privacy:metadata'] = 'The Ffmpeg-based audio/video to MP4 filter does not store any personal data.';

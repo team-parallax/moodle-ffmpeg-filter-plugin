@@ -18,21 +18,20 @@
 /**
  * Version information
  *
- * @package    filter_html5avtomp4
- * @copyright  2019 Université de Lausanne
- * @author     Nicolas.Dunand@unil.ch
+ * @package    filter_avtomp4ffmpeg
+ * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-define('FILTER_HTML5AVTOMP4_JOBSPERPASS', 5);
-define('FILTER_HTML5AVTOMP4_JOBSTATUS_INITIAL', 0);
-define('FILTER_HTML5AVTOMP4_JOBSTATUS_RUNNING', 1);
-define('FILTER_HTML5AVTOMP4_JOBSTATUS_DONE', 2);
-define('FILTER_HTML5AVTOMP4_JOBSTATUS_FAILED', 3);
-define('FILTER_HTML5AVTOMP4_INPUTFILE_PLACEHOLDER', '{%INPUTFILE%}');
-define('FILTER_HTML5AVTOMP4_OUTPUTFILE_PLACEHOLDER', '{%OUTPUTFILE%}');
+define('FILTER_AVTOMP4FFMPEG_JOBSPERPASS', 5);
+define('FILTER_AVTOMP4FFMPEG_JOBSTATUS_INITIAL', 0);
+define('FILTER_AVTOMP4FFMPEG_JOBSTATUS_RUNNING', 1);
+define('FILTER_AVTOMP4FFMPEG_JOBSTATUS_DONE', 2);
+define('FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED', 3);
+define('FILTER_AVTOMP4FFMPEG_INPUTFILE_PLACEHOLDER', '{%INPUTFILE%}');
+define('FILTER_AVTOMP4FFMPEG_OUTPUTFILE_PLACEHOLDER', '{%OUTPUTFILE%}');
 
 /**
  * @param int|null  $jobid
@@ -41,10 +40,10 @@ define('FILTER_HTML5AVTOMP4_OUTPUTFILE_PLACEHOLDER', '{%OUTPUTFILE%}');
  * @throws dml_exception
  * @throws file_exception
  */
-function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace = true) {
-    $pathtoffmpeg = get_config('filter_html5avtomp4', 'pathtoffmpeg');
+function filter_avtomp4ffmpeg_processjobs(?int $jobid = null, ?bool $displaytrace = true) {
+    $ffmpegwebserviceurl = get_config('filter_avtomp4ffmpeg', 'ffmpegwebserviceurl');
 
-    if (empty($pathtoffmpeg) || !is_executable(trim($pathtoffmpeg))) {
+    if (empty($ffmpegwebserviceurl) || !is_executable(trim($ffmpegwebserviceurl))) {
         // don't bother if ffmpeg is not usable
         if ($displaytrace) {
             mtrace('ffmpeg not available, aborting');
@@ -56,15 +55,15 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
     global $DB;
 
     if ($jobid > 0) {
-        $jobs = $DB->get_records('filter_html5avtomp4_jobs', [
+        $jobs = $DB->get_records('filter_avtomp4ffmpeg_jobs', [
                 'id'     => $jobid,
-                'status' => FILTER_HTML5AVTOMP4_JOBSTATUS_INITIAL
+                'status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_INITIAL
         ]);
     }
     else {
         // take one job at a time
-        $jobs = $DB->get_records('filter_html5avtomp4_jobs', ['status' => FILTER_HTML5AVTOMP4_JOBSTATUS_INITIAL],
-                'id ASC', '*', '0', FILTER_HTML5AVTOMP4_JOBSPERPASS);
+        $jobs = $DB->get_records('filter_avtomp4ffmpeg_jobs', ['status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_INITIAL],
+                'id ASC', '*', '0', FILTER_AVTOMP4FFMPEG_JOBSPERPASS);
         if ($displaytrace) {
             mtrace('found ' . count($jobs) . ' jobs');
         }
@@ -86,8 +85,8 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
         $source_format = pathinfo($inputfile->get_filename(), PATHINFO_EXTENSION);
 
         if (!$inputfile) {
-            $job->status = FILTER_HTML5AVTOMP4_JOBSTATUS_FAILED;
-            $DB->update_record('filter_html5avtomp4_jobs', $job);
+            $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED;
+            $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
 
             if ($displaytrace) {
                 mtrace('file ' . $job->fileid . ' not found');
@@ -97,11 +96,11 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
         }
 
         // to make sure we don't try to run the same job twice
-        $job->status = FILTER_HTML5AVTOMP4_JOBSTATUS_RUNNING;
-        $DB->update_record('filter_html5avtomp4_jobs', $job);
+        $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_RUNNING;
+        $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
 
-        $tempdir = make_temp_directory('filter_html5avtomp4');
-        $tmpinputfilepath = $inputfile->copy_content_to_temp('filter_html5avtomp4');
+        $tempdir = make_temp_directory('filter_avtomp4ffmpeg');
+        $tmpinputfilepath = $inputfile->copy_content_to_temp('filter_avtomp4ffmpeg');
         $tmpoutputfilename = str_replace('.ogg', '.m4a', $inputfile->get_filename());
         $tmpoutputfilename = str_replace('.webm', '.mp4', $tmpoutputfilename);
         $tmpoutputfilename = str_replace('.ogv', '.mp4', $tmpoutputfilename);
@@ -110,20 +109,20 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
         $target_format = pathinfo($inputfile->get_filename(), PATHINFO_EXTENSION);
         $type = (strpos($tmpoutputfilename, '.m4a') !== false) ? 'audio' : 'video';
 
-        $inputfileplaceholder_preg = preg_quote(FILTER_HTML5AVTOMP4_INPUTFILE_PLACEHOLDER, '/');
-        $outputfileplaceholder_preg = preg_quote(FILTER_HTML5AVTOMP4_OUTPUTFILE_PLACEHOLDER, '/');
+        $inputfileplaceholder_preg = preg_quote(FILTER_AVTOMP4FFMPEG_INPUTFILE_PLACEHOLDER, '/');
+        $outputfileplaceholder_preg = preg_quote(FILTER_AVTOMP4FFMPEG_OUTPUTFILE_PLACEHOLDER, '/');
         $ffmpegoptions =
                 preg_replace('/^(.*)' . $inputfileplaceholder_preg . '(.*)' . $outputfileplaceholder_preg . '(.*)$/',
                         '$1 ' . escapeshellarg($tmpinputfilepath) . ' $2 ' . escapeshellarg($tmpoutputfilepath) . ' $3',
-                        get_config('filter_html5avtomp4', $type . 'ffmpegsettings'));
+                        get_config('filter_avtomp4ffmpeg', $type . 'ffmpegsettings'));
 
-        $command = escapeshellcmd(trim($pathtoffmpeg) . ' ' . $ffmpegoptions);
+        $command = escapeshellcmd(trim($ffmpegwebserviceurl) . ' ' . $ffmpegoptions);
         if ($displaytrace) {
             mtrace($command);
         }
 
         // $request_body = array(
-        //     "conversionFile" => "@". $pathtoffmpeg,
+        //     "conversionFile" => "@". $ffmpegwebserviceurl,
         //     "originalFormat" => $source_format,
         //     "targetFormat" => $target_format
         // );
@@ -142,8 +141,8 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
         unlink($tmpinputfilepath); // not needed anymore
 
         if (!file_exists($tmpoutputfilepath) || !is_readable($tmpoutputfilepath)) {
-            $job->status = FILTER_HTML5AVTOMP4_JOBSTATUS_FAILED;
-            $DB->update_record('filter_html5avtomp4_jobs', $job);
+            $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED;
+            $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
 
             if ($displaytrace) {
                 mtrace('output file not found');
@@ -171,8 +170,8 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
             $outputfile = $fs->create_file_from_pathname($outputfile_properties, $tmpoutputfilepath);
         }
         catch (Exception $exception) {
-            $job->status = FILTER_HTML5AVTOMP4_JOBSTATUS_FAILED;
-            $DB->update_record('filter_html5avtomp4_jobs', $job);
+            $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED;
+            $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
 
             if ($displaytrace) {
                 mtrace('file could not be saved: ' . $exception->getMessage());
@@ -182,8 +181,8 @@ function filter_html5avtomp4_processjobs(?int $jobid = null, ?bool $displaytrace
         }
         unlink($tmpoutputfilepath); // not needed anymore
 
-        $job->status = FILTER_HTML5AVTOMP4_JOBSTATUS_DONE;
-        $DB->update_record('filter_html5avtomp4_jobs', $job);
+        $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_DONE;
+        $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
 
         if ($displaytrace) {
             mtrace('created file id ' . $outputfile->get_id());

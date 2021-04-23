@@ -4,7 +4,7 @@
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
     <TABLES>
-        <TABLE NAME="filter_html5avtomp4_jobs" COMMENT="videos to be processes by ffmpeg via filter_html5avtomp4">
+        <TABLE NAME="filter_avtomp4ffmpeg_jobs" COMMENT="videos to be processes by ffmpeg via filter_avtomp4ffmpeg">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
                 <FIELD NAME="fileid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>

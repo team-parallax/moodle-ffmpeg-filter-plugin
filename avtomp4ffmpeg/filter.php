@@ -18,18 +18,17 @@
 /**
  * Version information
  *
- * @package    filter_html5avtomp4
- * @copyright  2019 Université de Lausanne
- * @author     Nicolas.Dunand@unil.ch
+ * @package    filter_avtomp4ffmpeg
+ * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/filelib.php');
-require_once($CFG->dirroot . '/filter/html5avtomp4/locallib.php');
+require_once($CFG->dirroot . '/filter/avtomp4ffmpeg/locallib.php');
 
-class filter_html5avtomp4 extends moodle_text_filter {
+class filter_avtomp4ffmpeg extends moodle_text_filter {
 
     function filter($text, array $options = array()) {
 
@@ -38,21 +37,21 @@ class filter_html5avtomp4 extends moodle_text_filter {
             return $text;
         }
 
-        if (get_config('filter_html5avtomp4', 'convertaudio') === false && get_config('filter_html5avtomp4',
+        if (get_config('filter_avtomp4ffmpeg', 'convertaudio') === false && get_config('filter_avtomp4ffmpeg',
                         'convertvideo') === false) {
             // plugin is not configured to convert anything
             return $text;
         }
 
-        if ((get_config('filter_html5avtomp4', 'convertaudio') === false || strpos($text,
-                                '</audio>') === false) && (get_config('filter_html5avtomp4',
+        if ((get_config('filter_avtomp4ffmpeg', 'convertaudio') === false || strpos($text,
+                                '</audio>') === false) && (get_config('filter_avtomp4ffmpeg',
                                 'convertvideo') === false || strpos($text, '</video>') === false)) {
             // nothing to do
             return $text;
         }
 
         $pattern = '/(<(audio|video)[^>]+>)[^<]*(<source src="[^"]+"[^>]*>[^<]+?)+?[^<]*(<\/\2>)/sU';
-        $text = preg_replace_callback($pattern, 'filter_html5avtomp4_checksources', $text);
+        $text = preg_replace_callback($pattern, 'filter_avtomp4ffmpeg_checksources', $text);
 
         return $text;
     }
@@ -67,7 +66,7 @@ class filter_html5avtomp4 extends moodle_text_filter {
  * @throws dml_exception
  * @throws file_exception
  */
-function filter_html5avtomp4_checksources($matches) {
+function filter_avtomp4ffmpeg_checksources($matches) {
     global $CFG;
 
     $fullmatch = array_shift($matches);
@@ -97,7 +96,7 @@ function filter_html5avtomp4_checksources($matches) {
         return $fullmatch;
     }
 
-    $toconvert_fileextensions = array_map('trim', explode(',', get_config('filter_html5avtomp4', 'convertonlyexts')));
+    $toconvert_fileextensions = array_map('trim', explode(',', get_config('filter_avtomp4ffmpeg', 'convertonlyexts')));
     $src_fileextension = preg_replace('/^.*\.([a-zA-Z0-9]{3,4})$/', '$1', strtolower($src_url));
     if (!in_array($src_fileextension, $toconvert_fileextensions)) {
         // no need to continue as no extra source is required
@@ -143,23 +142,23 @@ function filter_html5avtomp4_checksources($matches) {
         return $fullmatch;
     }
 
-    if (is_null($outputfile) && get_config('filter_html5avtomp4', 'convert' . $type)) {
+    if (is_null($outputfile) && get_config('filter_avtomp4ffmpeg', 'convert' . $type)) {
         global $DB;
 
-        $existingjob = $DB->get_record('filter_html5avtomp4_jobs', ['fileid' => $inputfile->get_id()]);
+        $existingjob = $DB->get_record('filter_avtomp4ffmpeg_jobs', ['fileid' => $inputfile->get_id()]);
         // first make sure there's not yet a job planned for this file
 
         if (!$existingjob) {
             // let's create a job to convert this file
             $job = (object)[
                     'fileid' => $inputfile->get_id(),
-                    'status' => FILTER_HTML5AVTOMP4_JOBSTATUS_INITIAL
+                    'status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_INITIAL
             ];
-            $jobid = $DB->insert_record('filter_html5avtomp4_jobs', $job);
+            $jobid = $DB->insert_record('filter_avtomp4ffmpeg_jobs', $job);
 
             if ($type == 'audio') {
                 // process audio jobs immediately
-                \filter_html5avtomp4_processjobs($jobid, false);
+                \filter_avtomp4ffmpeg_processjobs($jobid, false);
             }
         }
 

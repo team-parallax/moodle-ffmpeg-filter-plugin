@@ -18,13 +18,13 @@
 /**
  * Version information
  *
- * @package    filter_html5avtomp4
- * @copyright  2019 Université de Lausanne
- * @author     Nicolas.Dunand@unil.ch
+ * @package    filter_avtomp4ffmpeg
+ * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
+ 
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace filter_html5avtomp4\privacy;
+namespace filter_avtomp4ffmpeg\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 

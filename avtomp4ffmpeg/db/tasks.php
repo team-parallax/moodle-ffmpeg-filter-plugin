@@ -18,9 +18,9 @@
 /**
  * Version information
  *
- * @package    filter_html5avtomp4
- * @copyright  2019 Université de Lausanne
- * @author     Nicolas.Dunand@unil.ch
+ * @package    filter_avtomp4ffmpeg
+ * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
+ 
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = array(
         array(
-                'classname' => 'filter_html5avtomp4\task\processjobs_task',
+                'classname' => 'filter_avtomp4ffmpeg\task\processjobs_task',
                 'blocking'  => 0,
                 'minute'    => '*',
                 'hour'      => '*',
