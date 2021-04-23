@@ -42,51 +42,51 @@ define('FILTER_AVTOMP4FFMPEG_OUTPUTFILE_PLACEHOLDER', '{%OUTPUTFILE%}');
  */
 function filter_avtomp4ffmpeg_processjobs(?int $jobid = null, ?bool $displaytrace = true) {
     $ffmpegwebserviceurl = get_config('filter_avtomp4ffmpeg', 'ffmpegwebserviceurl');
-
-    if (empty($ffmpegwebserviceurl) || !is_executable(trim($ffmpegwebserviceurl))) {
+    if (empty($ffmpegwebserviceurl)) {
         // don't bother if ffmpeg is not usable
         if ($displaytrace) {
-            mtrace('ffmpeg not available, aborting');
+            mtrace('ffmpeg webservice url not available, aborting');
         }
-
         return;
     }
-
     global $DB;
-
     if ($jobid > 0) {
         $jobs = $DB->get_records('filter_avtomp4ffmpeg_jobs', [
-                'id'     => $jobid,
-                'status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_INITIAL
+            'id'     => $jobid,
+            'status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_INITIAL,
+            'status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_RUNNING
         ]);
-    }
-    else {
+    } else {
         // take one job at a time
-        $jobs = $DB->get_records('filter_avtomp4ffmpeg_jobs', ['status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_INITIAL],
-                'id ASC', '*', '0', FILTER_AVTOMP4FFMPEG_JOBSPERPASS);
+        $jobs = $DB->get_records(
+            'filter_avtomp4ffmpeg_jobs',
+            [
+                'status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_INITIAL,
+                'status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_RUNNING
+            ],
+            'id ASC',
+            '*',
+            '0',
+            FILTER_AVTOMP4FFMPEG_JOBSPERPASS
+        );
         if ($displaytrace) {
             mtrace('found ' . count($jobs) . ' jobs');
         }
-
     }
-
     while ($job = array_shift($jobs)) {
         if (!$job) {
             if ($displaytrace) {
                 mtrace('no jobs found');
             }
-
             return;
         }
-
         $fs = get_file_storage();
         $inputfile = $fs->get_file_by_id($job->fileid);
-        // TODO: Get Extension
-        $source_format = pathinfo($inputfile->get_filename(), PATHINFO_EXTENSION);
 
         if (!$inputfile) {
-            $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED;
-            $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
+            // $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED;
+            // $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
+            update_job_and_record($job, FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED);
 
             if ($displaytrace) {
                 mtrace('file ' . $job->fileid . ' not found');
@@ -94,11 +94,19 @@ function filter_avtomp4ffmpeg_processjobs(?int $jobid = null, ?bool $displaytrac
 
             return;
         }
-
+        // TODO: Get Source-Extension
+        $source_format = pathinfo($inputfile->get_filename(), PATHINFO_EXTENSION);
+        $target_format = pathinfo($inputfile->get_filename(), PATHINFO_EXTENSION);
+        // retrieve file conversion status from the webservice
+        if ($job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_RUNNING) {
+            // TODO: Implement call to webservice
+            // TODO: In case the result is 'converted' update the job-record and write output.
+        }
         // to make sure we don't try to run the same job twice
-        $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_RUNNING;
-        $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
-
+        // $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_RUNNING;
+        // $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
+        update_job_and_record($job, FILTER_AVTOMP4FFMPEG_JOBSTATUS_RUNNING);
+        // create temp directory for data storage during conversion
         $tempdir = make_temp_directory('filter_avtomp4ffmpeg');
         $tmpinputfilepath = $inputfile->copy_content_to_temp('filter_avtomp4ffmpeg');
         $tmpoutputfilename = str_replace('.ogg', '.m4a', $inputfile->get_filename());
@@ -106,15 +114,16 @@ function filter_avtomp4ffmpeg_processjobs(?int $jobid = null, ?bool $displaytrac
         $tmpoutputfilename = str_replace('.ogv', '.mp4', $tmpoutputfilename);
         $tmpoutputfilepath = $tempdir . DIRECTORY_SEPARATOR . $tmpoutputfilename;
 
-        $target_format = pathinfo($inputfile->get_filename(), PATHINFO_EXTENSION);
         $type = (strpos($tmpoutputfilename, '.m4a') !== false) ? 'audio' : 'video';
 
         $inputfileplaceholder_preg = preg_quote(FILTER_AVTOMP4FFMPEG_INPUTFILE_PLACEHOLDER, '/');
         $outputfileplaceholder_preg = preg_quote(FILTER_AVTOMP4FFMPEG_OUTPUTFILE_PLACEHOLDER, '/');
         $ffmpegoptions =
-                preg_replace('/^(.*)' . $inputfileplaceholder_preg . '(.*)' . $outputfileplaceholder_preg . '(.*)$/',
-                        '$1 ' . escapeshellarg($tmpinputfilepath) . ' $2 ' . escapeshellarg($tmpoutputfilepath) . ' $3',
-                        get_config('filter_avtomp4ffmpeg', $type . 'ffmpegsettings'));
+            preg_replace(
+                '/^(.*)' . $inputfileplaceholder_preg . '(.*)' . $outputfileplaceholder_preg . '(.*)$/',
+                '$1 ' . escapeshellarg($tmpinputfilepath) . ' $2 ' . escapeshellarg($tmpoutputfilepath) . ' $3',
+                get_config('filter_avtomp4ffmpeg', $type . 'ffmpegsettings')
+            );
 
         $command = escapeshellcmd(trim($ffmpegwebserviceurl) . ' ' . $ffmpegoptions);
         if ($displaytrace) {
@@ -141,9 +150,9 @@ function filter_avtomp4ffmpeg_processjobs(?int $jobid = null, ?bool $displaytrac
         unlink($tmpinputfilepath); // not needed anymore
 
         if (!file_exists($tmpoutputfilepath) || !is_readable($tmpoutputfilepath)) {
-            $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED;
-            $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
-
+            // $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED;
+            // $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
+            update_job_and_record($job, FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED);
             if ($displaytrace) {
                 mtrace('output file not found');
             }
@@ -154,25 +163,24 @@ function filter_avtomp4ffmpeg_processjobs(?int $jobid = null, ?bool $displaytrac
         $fs = get_file_storage();
         $inputfile_properties = $DB->get_record('files', ['id' => $inputfile->get_id()]);
         $outputfile_properties = [
-                'contextid'    => $inputfile_properties->contextid,
-                'component'    => $inputfile_properties->component,
-                'filearea'     => $inputfile_properties->filearea,
-                'itemid'       => $inputfile_properties->itemid,
-                'filepath'     => $inputfile_properties->filepath,
-                'filename'     => $tmpoutputfilename,
-                'userid'       => $inputfile_properties->userid,
-                'author'       => $inputfile_properties->author,
-                'license'      => $inputfile_properties->license,
-                'timecreated'  => time(),
-                'timemodified' => time()
+            'contextid'    => $inputfile_properties->contextid,
+            'component'    => $inputfile_properties->component,
+            'filearea'     => $inputfile_properties->filearea,
+            'itemid'       => $inputfile_properties->itemid,
+            'filepath'     => $inputfile_properties->filepath,
+            'filename'     => $tmpoutputfilename,
+            'userid'       => $inputfile_properties->userid,
+            'author'       => $inputfile_properties->author,
+            'license'      => $inputfile_properties->license,
+            'timecreated'  => time(),
+            'timemodified' => time()
         ];
         try {
             $outputfile = $fs->create_file_from_pathname($outputfile_properties, $tmpoutputfilepath);
-        }
-        catch (Exception $exception) {
-            $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED;
-            $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
-
+        } catch (Exception $exception) {
+            // $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED;
+            // $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
+            update_job_and_record($job, FILTER_AVTOMP4FFMPEG_JOBSTATUS_FAILED);
             if ($displaytrace) {
                 mtrace('file could not be saved: ' . $exception->getMessage());
             }
@@ -181,11 +189,22 @@ function filter_avtomp4ffmpeg_processjobs(?int $jobid = null, ?bool $displaytrac
         }
         unlink($tmpoutputfilepath); // not needed anymore
 
-        $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_DONE;
-        $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
-
+        // $job->status = FILTER_AVTOMP4FFMPEG_JOBSTATUS_DONE;
+        // $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
+        update_job_and_record($job, FILTER_AVTOMP4FFMPEG_JOBSTATUS_DONE);
         if ($displaytrace) {
             mtrace('created file id ' . $outputfile->get_id());
         }
     }
+}
+
+/**
+ * @param $job
+ * @param int $new_status
+ *
+ */
+function update_job_and_record($job, $new_status) {
+    global $DB;
+    $job->status = $new_status;
+    $DB->update_record('filter_avtomp4ffmpeg_jobs', $job);
 }

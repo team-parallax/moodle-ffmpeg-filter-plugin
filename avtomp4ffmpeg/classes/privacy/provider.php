@@ -20,7 +20,6 @@
  *
  * @package    filter_avtomp4ffmpeg
  * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
- 
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
