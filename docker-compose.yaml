@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   mariadb:
     image: 'docker.io/bitnami/mariadb:10.3-debian-10'
@@ -24,5 +24,6 @@ services:
       - 'moodledata:/bitnami/moodle'
     depends_on:
       - mariadb
-    volumes:
-      - data:
+volumes:
+  data:
+  moodledata:
