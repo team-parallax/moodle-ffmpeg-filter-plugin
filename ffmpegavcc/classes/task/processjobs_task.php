@@ -13,28 +13,39 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Version information
  *
- * @package    filter_avtomp4ffmpeg
+ * @package    filter_ffmpegavcc
  * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
  
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace filter_ffmpegavcc\task;
+
 defined('MOODLE_INTERNAL') || die();
 
-$tasks = array(
-        array(
-                'classname' => 'filter_avtomp4ffmpeg\task\processjobs_task',
-                'blocking'  => 0,
-                'minute'    => '*',
-                'hour'      => '*',
-                'day'       => '*',
-                'month'     => '*',
-                'dayofweek' => '*'
-        ),
-);
+class processjobs_task extends \core\task\scheduled_task {
 
+    /**
+     * Get a descriptive name for this task (shown to admins).
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('processjobs_task', 'filter_ffmpegavcc');
+    }
+
+    /**
+     * Run the task
+     */
+    public function execute() {
+        global $CFG;
+        require_once($CFG->dirroot . '/filter/ffmpegavcc/locallib.php');
+        \filter_ffmpegavcc_processjobs(null, true);
+    }
+
+}

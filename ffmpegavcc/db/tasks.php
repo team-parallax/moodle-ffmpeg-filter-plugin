@@ -18,14 +18,23 @@
 /**
  * Version information
  *
- * @package    filter_avtomp4ffmpeg
- * @copyright  2019 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
+ * @package    filter_ffmpegavcc
+ * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
+ 
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021042303;
-$plugin->requires = 2019052000; // Moodle 3.7
-$plugin->component = 'filter_avtomp4ffmpeg';
+$tasks = array(
+        array(
+                'classname' => 'filter_ffmpegavcc\task\processjobs_task',
+                'blocking'  => 0,
+                'minute'    => '*',
+                'hour'      => '*',
+                'day'       => '*',
+                'month'     => '*',
+                'dayofweek' => '*'
+        ),
+);
 

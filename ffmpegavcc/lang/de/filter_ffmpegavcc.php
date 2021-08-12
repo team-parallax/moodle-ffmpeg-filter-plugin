@@ -18,28 +18,23 @@
 /**
  * Version information
  *
- * @package    filter_avtomp4ffmpeg
+ * @package    filter_ffmpegavcc
  * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['filtername'] = 'Ffmpeg-basierter audio/video zu MP4 Konvertierungsfilter';
+$string['filtername'] = 'ffmpegavcc - Kompatibilitätsfilter';
 $string['ffmpegwebserviceurl'] = 'Ffmpeg-Webservice URL';
 $string['ffmpegwebserviceurldefault'] = 'https://beispiel-konvertierungsservice.com';
 $string['ffmpegwebserviceurl_desc'] = 'URL für den ffmpeg-Konverterservice';
 $string['convertaudio'] = 'Audio konvertieren';
-$string['convertaudio_desc'] = 'Konvertiert .OGG Dateien zu .MP4 (M4A)';
+$string['convertaudio_desc'] = 'Konvertiert OGG Dateien zu MP3';
 $string['convertvideo'] = 'Video konvertieren';
-$string['convertvideo_desc'] = 'Konvertiert .WEBM Dateien zu .MP4';
-$string['processjobs_task'] = 'Prozess des Re-Encodings von MP4 Dateien';
+$string['convertvideo_desc'] = 'Konvertiert OGV/WEBM Dateien zu MP4';
+$string['processjobs_task'] = 'Prozess des Re-Encodings von Mediendateien';
 $string['convertonlyexts'] = 'Nur Dateien mit dieser Endung konvertieren';
-$string['convertonlyexts_desc'] = 'Komma separierte Liste an Dateiendungen die zu MP4 konvertiert werden sollen';
-$string['privacy:metadata'] = 'Der Ffmpeg-basierte audio/video zu MP4 Filter speichert keine persönlichen Daten.';
-// TODO: Review if needed here
-$string['audioffmpegsettings'] = 'Einstellungen - Audio-Konvertierungen';
-// TODO: Review if needed here
-$string['audioffmpegsettings_desc'] = 'This should contain at least "-i {%INPUTFILE%} {%OUTPUTFILE%}"; place your options around these as needed';
-// TODO: Review if needed here
-$string['videoffmpegsettings'] = 'Einstellungen - Video-Konvertierung';
-// TODO: Review if needed here
-$string['videoffmpegsettings_desc'] = 'This should contain at least "-i {%INPUTFILE%} {%OUTPUTFILE%}"; place your options around these as needed';
+$string['convertonlyexts_desc'] = 'Komma separierte Liste an Dateiendungen die konvertiert werden sollen';
+$string['privacy:metadata'] = 'Der ffmpegavcc - Kompatibilitätsfilter speichert keine persönlichen Daten.';
+$string['test_ffmpegws'] = 'Testen Sie die Verbindung zum Ffmpeg-Webservice';
+$string['test_ffmpeg_connection_ok'] = 'Der Webservice ist erreichbar und bereit.';
+$string['test_ffmpeg_connection_error'] = 'Der Webservice hat auf den "Ping" nicht reagiert oder ist nicht erreichbar.';

@@ -18,18 +18,14 @@
 /**
  * Version information
  *
- * @package    filter_avtomp4ffmpeg
- * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
+ * @package    filter_ffmpegavcc
+ * @copyright  2019 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace filter_avtomp4ffmpeg\privacy;
-
 defined('MOODLE_INTERNAL') || die();
 
-class provider implements \core_privacy\local\metadata\null_provider {
+$plugin->version = 2021050705;
+$plugin->requires = 2019052000; // Moodle 3.7
+$plugin->component = 'filter_ffmpegavcc';
 
-    public static function get_reason() : string {
-        return 'privacy:metadata';
-    }
-}
