@@ -18,24 +18,23 @@
 /**
  * Version information
  *
- * @package    filter_avtomp4ffmpeg
+ * @package    filter_ffmpegavcc
  * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['filtername'] = 'Ffmpeg-based audio/video to MP4 filter';
+$string['filtername'] = 'ffmpegavcc - Compatibility Filter';
 $string['ffmpegwebserviceurl'] = 'Ffmpeg-Webservice URL';
 $string['ffmpegwebserviceurldefault'] = 'https://example-converterservice.com';
 $string['ffmpegwebserviceurl_desc'] = 'URL of the conversion service for ffmpeg';
 $string['convertaudio'] = 'Convert audio';
-$string['convertaudio_desc'] = 'Convert audio OGG files to MP4 (M4A)';
+$string['convertaudio_desc'] = 'Convert audio OGG files to MP3';
 $string['convertvideo'] = 'Convert video';
 $string['convertvideo_desc'] = 'Convert video WEBM files to MP4';
-$string['processjobs_task'] = 'Process reencoding non-MP4 files';
-$string['audioffmpegsettings'] = 'ffmpeg settings for audio conversion';
-$string['audioffmpegsettings_desc'] = 'This should contain at least "-i {%INPUTFILE%} {%OUTPUTFILE%}"; place your options around these as needed';
-$string['videoffmpegsettings'] = 'ffmpeg settings for video conversion';
-$string['videoffmpegsettings_desc'] = 'This should contain at least "-i {%INPUTFILE%} {%OUTPUTFILE%}"; place your options around these as needed';
+$string['processjobs_task'] = 'Process reencoding media files';
 $string['convertonlyexts'] = 'convert only these extensions';
-$string['convertonlyexts_desc'] = 'Comma-separated list of file extensions to be converted to mp4';
-$string['privacy:metadata'] = 'The Ffmpeg-based audio/video to MP4 filter does not store any personal data.';
+$string['convertonlyexts_desc'] = 'Comma-separated list of file extensions to be converted';
+$string['privacy:metadata'] = 'The ffmpegavcc - Compatibility Filter does not store any personal data.';
+$string['test_ffmpegws'] = 'Test Connection to Ffmpeg-Webservice';
+$string['test_ffmpeg_connection_ok'] = 'The webservice seems to be correctly configured and ready.';
+$string['test_ffmpeg_connection_error'] = 'The webservice was not reachable or unresponsive when pinging.';

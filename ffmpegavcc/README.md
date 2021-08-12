@@ -10,9 +10,15 @@ This Plugin is based on the HTML5 audio/video to MP4 filter from [Nicolas Dunand
 >
 >This plugin then checks for the existence of an `mp4` source in the same file area and provides it automatically if it exists. In the case the `mp4` source does not exist, it is created via a scheduled task.
 
+This filter extends the original functionality in a way that `audio` elements are converted to a compatible audio format (`mp3`) whereas `video` elements are converted to `mp4`.
+
 ## Requirements
 
 A running ffmpeg-conversion-webservice and its url to be set in plugin settings.
+
+Enter the url of your webservice when requested:
+
+
 
 ## Installation
 

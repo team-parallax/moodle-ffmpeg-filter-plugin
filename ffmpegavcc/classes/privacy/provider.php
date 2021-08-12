@@ -18,34 +18,18 @@
 /**
  * Version information
  *
- * @package    filter_avtomp4ffmpeg
+ * @package    filter_ffmpegavcc
  * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
- 
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace filter_avtomp4ffmpeg\task;
+namespace filter_ffmpegavcc\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
-class processjobs_task extends \core\task\scheduled_task {
+class provider implements \core_privacy\local\metadata\null_provider {
 
-    /**
-     * Get a descriptive name for this task (shown to admins).
-     *
-     * @return string
-     */
-    public function get_name() {
-        return get_string('processjobs_task', 'filter_avtomp4ffmpeg');
+    public static function get_reason() : string {
+        return 'privacy:metadata';
     }
-
-    /**
-     * Run the task
-     */
-    public function execute() {
-        global $CFG;
-        require_once($CFG->dirroot . '/filter/html5avtomp4/locallib.php');
-        \filter_avtomp4ffmpeg_processjobs();
-    }
-
 }
