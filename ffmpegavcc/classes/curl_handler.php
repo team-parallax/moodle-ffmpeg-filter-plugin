@@ -69,11 +69,31 @@ class curl_handler
             return false;
         }
         curl_close($ch);
-        $result = utf8_encode($response);
         if ($raw) {
             return $result;
         }
+        $result = utf8_encode($response);
         return json_decode($result);
+    }
+    public static function download_file($url, $target_path)
+    {
+        if (!$url || !is_string($url)) {
+            return false;
+        }
+        $fh = fopen($target_path, "w");
+        $ch = curl_init($url);
+        if ($ch === false) {
+            return false;
+        }
+        curl_setopt($ch, CURLOPT_FILE, $fh);
+        curl_exec($ch);
+        $err = curl_errno($ch);
+        if ($err) {
+            curl_close($ch);
+            return false;
+        }
+        curl_close($ch);
+        fclose($fh);
     }
     public static function get_http_response_code($url)
     {

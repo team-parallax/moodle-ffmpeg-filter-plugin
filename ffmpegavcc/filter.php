@@ -100,7 +100,6 @@ function filter_ffmpegavcc_checksources($matches)
     // so we can now assume there is only one element in $source_tags
     $source_tag = array_pop($source_tags);
     $src_url = preg_replace('/^.*src="([^"]+)".*$/s', '$1', $source_tag);
-    var_dump($src_url);
 
     if (strpos($src_url, $CFG->wwwroot) === false) {
         // file is not hosted on the Moodle server, abort
@@ -109,7 +108,6 @@ function filter_ffmpegavcc_checksources($matches)
 
     $toconvert_fileextensions = array_map('trim', explode(',', get_config('filter_ffmpegavcc', 'convertonlyexts')));
     $src_fileextension = preg_replace('/^.*\.([a-zA-Z0-9]{3,4})$/', '$1', strtolower($src_url));
-    var_dump("Found $src_fileextension");
     if (!in_array($src_fileextension, $toconvert_fileextensions)) {
         // no need to continue as no extra source is required
         return $fullmatch;
@@ -139,6 +137,7 @@ function filter_ffmpegavcc_checksources($matches)
     $files = $fs->get_area_files($contextid, $component, $filearea);
 
     foreach ($files as $file) {
+        
         if ($file->get_filename() === $inputfilename) {
             // this is the OGG or WEBM file
             $inputfile = $file;
@@ -157,6 +156,7 @@ function filter_ffmpegavcc_checksources($matches)
     if (is_null($outputfile) && get_config('filter_ffmpegavcc', 'convert' . $type)) {
         global $DB;
         $existingjob = $DB->get_record('filter_ffmpegavcc_jobs', ['fileid' => $inputfile->get_id()]);
+        var_dump($existingjob);
         // first make sure there's not yet a job planned for this file
 
         if (!$existingjob) {

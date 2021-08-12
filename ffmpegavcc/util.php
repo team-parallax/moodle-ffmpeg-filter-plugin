@@ -43,14 +43,14 @@ class Utility
         $response = curl_handler::fetch_url_data($url);
         return $response;
     }
-    static function get_converted_file($response)
+    static function get_converted_file($response, $target_path)
     {
         $conversion_id = $response->conversionId;
         Utility::log_to_file("Request converted file for id $conversion_id");
         $url = Utility::get_webservice_route("conversion/$conversion_id/download");
-        $file_response = curl_handler::fetch_url_data($url, true);
+        $file_response = curl_handler::download_file($url, $target_path);
         // file_put_contents("./response.mp4", $file_response);
-        $response->resultfile = $file_response;
+        // $response->resultfile = $file_response;
         return $response;
     }
     /**

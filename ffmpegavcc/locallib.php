@@ -117,7 +117,7 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
         $target_format = pathinfo($outname, PATHINFO_EXTENSION);
         var_dump("Create temp dir to save file");
         $tempdir = make_temp_directory('filter_ffmpegavcc');
-        $filename = "$tempdir/" . $inputfile->get_id() . ".$source_format";
+        // $filename = "$tempdir/" . $inputfile->get_id() . ".$source_format";
         try {
             // This function can either return false, or throw an exception so we need to handle both.
             if ($inputfile->copy_content_to($filename) === false) {
@@ -131,8 +131,9 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
             throw $fe;
         }
         $tmpinputfilepath = $inputfile->copy_content_to_temp('filter_ffmpegavcc');
-        $filepath = $inputfile->get_filepath();
-        var_dump("File path: $filename");
+        // $filepath = $inputfile->get_filepath();
+
+        var_dump("File path: $tmpinputfilepath");
         // Retrieve relevant info for API
         var_dump($outname);
         var_dump("Conversion from: \t$source_format\nto: \t$target_format");
@@ -140,9 +141,9 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
         if ($job->status == FILTER_FFMPEGAVCC_JOBSTATUS_INITIAL) {
             // to make sure we don't try to run the same job twice
             var_dump("Prepare conversion for jobid: $jobid");
-            $conversionfile = "@" . $filename;
-            var_dump("Conversion-File BEFORE cURLify: $conversionfile");
-            $conversionfile = new CURLFile($filename);
+            // $conversionfile = "@" . $filename;
+            // var_dump("Conversion-File BEFORE cURLify: $conversionfile");
+            $conversionfile = new CURLFile($tmpinputfilepath);
             $req_body = [
                 "conversionFile" => $conversionfile,
                 "originalFormat" => $source_format,
@@ -171,11 +172,11 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
                 var_dump("Outfile name is $outname");
                 $tmpoutputfilepath = $tempdir . DIRECTORY_SEPARATOR . $outname;
                 var_dump("fetch result file");
-                $response = Utility::get_converted_file($response);
-                var_dump("serialize file to string");
-                $str = pack('C*', ...$response->resultfile);
-                var_dump("write to file with moodle func");
-                file_put_contents($tmpoutputfilepath, $str);
+                $response = Utility::get_converted_file($response, $tmpoutputfilepath);
+                // var_dump("serialize file to string");
+                // $str = pack('C*', ...$response->resultfile);
+                // var_dump("write to file with moodle func");
+                // file_put_contents($tmpoutputfilepath, $str);
                 var_dump("Prepare job-record update");
                 if (!file_exists($tmpoutputfilepath) || !is_readable($tmpoutputfilepath)) {
                     var_dump("File not found: $tmpoutputfilepath");
