@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="filter/avtomp4ffmpeg/db" VERSION="20190602" COMMENT="XMLDB file for Moodle filter/avtomp4ffmpeg"
+<XMLDB PATH="filter/ffmpegavcc/db" VERSION="20190602" COMMENT="XMLDB file for Moodle filter/ffmpegavcc"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
     <TABLES>
-        <TABLE NAME="filter_avtomp4ffmpeg_jobs" COMMENT="videos to be processes by ffmpeg via filter_avtomp4ffmpeg">
+        <TABLE NAME="filter_ffmpegavcc_jobs" COMMENT="audios and videos to be processed by ffmpeg via filter_ffmpegavcc">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
                 <FIELD NAME="fileid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="conversionid" TYPE="char" LENGTH="36" NOTNULL="false" DEFAULT="null" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

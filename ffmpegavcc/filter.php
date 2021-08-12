@@ -18,44 +18,53 @@
 /**
  * Version information
  *
- * @package    filter_avtomp4ffmpeg
+ * @package    filter_ffmpegavcc
  * @copyright  2021 Sven Patrick Meier <sven.patrick.meier@team-parallax.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-
 require_once($CFG->libdir . '/filelib.php');
-require_once($CFG->dirroot . '/filter/avtomp4ffmpeg/locallib.php');
+require_once($CFG->dirroot . '/filter/ffmpegavcc/locallib.php');
+require_once('util.php');
 
-class filter_avtomp4ffmpeg extends moodle_text_filter {
+use filter_ffmpegavcc\util\Utility;
 
-    function filter($text, array $options = array()) {
 
+class filter_ffmpegavcc extends moodle_text_filter
+{
+
+    function filter($text, array $options = array())
+    {
         if (!is_string($text)) {
             // non string data can not be filtered anyway
             return $text;
         }
 
-        if (get_config('filter_avtomp4ffmpeg', 'convertaudio') === false && get_config('filter_avtomp4ffmpeg',
-                        'convertvideo') === false) {
+        if (get_config('filter_ffmpegavcc', 'convertaudio') === false && get_config(
+            'filter_ffmpegavcc',
+            'convertvideo'
+        ) === false) {
             // plugin is not configured to convert anything
             return $text;
         }
 
-        if ((get_config('filter_avtomp4ffmpeg', 'convertaudio') === false || strpos($text,
-                                '</audio>') === false) && (get_config('filter_avtomp4ffmpeg',
-                                'convertvideo') === false || strpos($text, '</video>') === false)) {
+        if ((get_config('filter_ffmpegavcc', 'convertaudio') === false || strpos(
+            $text,
+            '</audio>'
+        ) === false) && (get_config(
+            'filter_ffmpegavcc',
+            'convertvideo'
+        ) === false || strpos($text, '</video>') === false)) {
             // nothing to do
             return $text;
         }
 
         $pattern = '/(<(audio|video)[^>]+>)[^<]*(<source src="[^"]+"[^>]*>[^<]+?)+?[^<]*(<\/\2>)/sU';
-        $text = preg_replace_callback($pattern, 'filter_avtomp4ffmpeg_checksources', $text);
+        $text = preg_replace_callback($pattern, 'filter_ffmpegavcc_checksources', $text);
 
         return $text;
     }
-
 }
 
 /**
@@ -66,11 +75,12 @@ class filter_avtomp4ffmpeg extends moodle_text_filter {
  * @throws dml_exception
  * @throws file_exception
  */
-function filter_avtomp4ffmpeg_checksources($matches) {
+function filter_ffmpegavcc_checksources($matches)
+{
     global $CFG;
 
     $fullmatch = array_shift($matches);
-
+    var_dump($fullmatch);
     $tag_open = array_shift($matches);
     $tag_close = array_pop($matches);
 
@@ -90,14 +100,16 @@ function filter_avtomp4ffmpeg_checksources($matches) {
     // so we can now assume there is only one element in $source_tags
     $source_tag = array_pop($source_tags);
     $src_url = preg_replace('/^.*src="([^"]+)".*$/s', '$1', $source_tag);
+    var_dump($src_url);
 
     if (strpos($src_url, $CFG->wwwroot) === false) {
         // file is not hosted on the Moodle server, abort
         return $fullmatch;
     }
 
-    $toconvert_fileextensions = array_map('trim', explode(',', get_config('filter_avtomp4ffmpeg', 'convertonlyexts')));
+    $toconvert_fileextensions = array_map('trim', explode(',', get_config('filter_ffmpegavcc', 'convertonlyexts')));
     $src_fileextension = preg_replace('/^.*\.([a-zA-Z0-9]{3,4})$/', '$1', strtolower($src_url));
+    var_dump("Found $src_fileextension");
     if (!in_array($src_fileextension, $toconvert_fileextensions)) {
         // no need to continue as no extra source is required
         return $fullmatch;
@@ -116,8 +128,8 @@ function filter_avtomp4ffmpeg_checksources($matches) {
     $inputfilename = clean_param(array_pop($filepathargs), PARAM_FILE);
 
     $outputfile_ext = ($type == 'audio')
-            ? 'm4a'
-            : 'mp4';
+        ? 'mp3'
+        : 'mp4';
     $outputfilename = preg_replace('/\.' . $src_fileextension . '/i', '.' . $outputfile_ext, $inputfilename);
 
     $inputfile = null;
@@ -142,37 +154,34 @@ function filter_avtomp4ffmpeg_checksources($matches) {
         return $fullmatch;
     }
 
-    if (is_null($outputfile) && get_config('filter_avtomp4ffmpeg', 'convert' . $type)) {
+    if (is_null($outputfile) && get_config('filter_ffmpegavcc', 'convert' . $type)) {
         global $DB;
-
-        $existingjob = $DB->get_record('filter_avtomp4ffmpeg_jobs', ['fileid' => $inputfile->get_id()]);
+        $existingjob = $DB->get_record('filter_ffmpegavcc_jobs', ['fileid' => $inputfile->get_id()]);
         // first make sure there's not yet a job planned for this file
 
         if (!$existingjob) {
             // let's create a job to convert this file
             $job = (object)[
-                    'fileid' => $inputfile->get_id(),
-                    'status' => FILTER_AVTOMP4FFMPEG_JOBSTATUS_INITIAL
+                'fileid' => $inputfile->get_id(),
+                'status' => FILTER_FFMPEGAVCC_JOBSTATUS_INITIAL
             ];
-            $jobid = $DB->insert_record('filter_avtomp4ffmpeg_jobs', $job);
+            var_dump($job);
+            $jobid = $DB->insert_record('filter_ffmpegavcc_jobs', $job);
+            var_dump($jobid);
 
             if ($type == 'audio') {
                 // process audio jobs immediately
-                \filter_avtomp4ffmpeg_processjobs($jobid, false);
+                \filter_ffmpegavcc_processjobs($jobid, false);
             }
         }
 
         return $fullmatch;
-    }
-    else {
+    } else {
         // we're good to display the MP4 :))
-
         $extra_source_tags = [
-                '<source src="' . str_replace($inputfilename, $outputfilename, $src_url) . '" type="' . $outputfile->get_mimetype() . '">'
+            '<source src="' . str_replace($inputfilename, $outputfilename, $src_url) . '" type="' . $outputfile->get_mimetype() . '">'
         ];
     }
-
     $alltags = array_merge([$tag_open], [$source_tag], $extra_source_tags, [$tag_close]);
-
     return implode("\n", $alltags);
 }
