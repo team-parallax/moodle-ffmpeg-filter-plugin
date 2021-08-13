@@ -80,7 +80,6 @@ function filter_ffmpegavcc_checksources($matches)
     global $CFG;
 
     $fullmatch = array_shift($matches);
-    var_dump($fullmatch);
     $tag_open = array_shift($matches);
     $tag_close = array_pop($matches);
 
@@ -143,7 +142,7 @@ function filter_ffmpegavcc_checksources($matches)
             $inputfile = $file;
         }
         if ($file->get_filename() === $outputfilename) {
-            // this is the M4V or MP4 file
+            // this is the MP3 or MP4 file
             $outputfile = $file;
         }
     }

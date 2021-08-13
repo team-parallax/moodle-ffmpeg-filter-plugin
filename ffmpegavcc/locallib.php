@@ -168,15 +168,10 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
             if ($response->status == "converted") {
                 var_dump("handle conversion-success");
                 // Handles conversion success
-                // $tmpoutputfilename = get_outputfile_name($inputfile);
                 var_dump("Outfile name is $outname");
                 $tmpoutputfilepath = $tempdir . DIRECTORY_SEPARATOR . $outname;
                 var_dump("fetch result file");
                 $response = Utility::get_converted_file($response, $tmpoutputfilepath);
-                // var_dump("serialize file to string");
-                // $str = pack('C*', ...$response->resultfile);
-                // var_dump("write to file with moodle func");
-                // file_put_contents($tmpoutputfilepath, $str);
                 var_dump("Prepare job-record update");
                 if (!file_exists($tmpoutputfilepath) || !is_readable($tmpoutputfilepath)) {
                     var_dump("File not found: $tmpoutputfilepath");
@@ -190,6 +185,7 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
                 $fs = get_file_storage();
                 $inputfile_properties = $DB->get_record('files', ['id' => $inputfile->get_id()]);
                 $outputfile_properties = [
+                    'id' => $inputfile_properties->id,
                     'contextid'    => $inputfile_properties->contextid,
                     'component'    => $inputfile_properties->component,
                     'filearea'     => $inputfile_properties->filearea,
@@ -217,6 +213,8 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
                 unlink($tmpoutputfilepath); // not needed anymore, since we just stored the converted outfile
                 var_dump("Update db-record for conversion");
                 update_job_and_record($job, FILTER_FFMPEGAVCC_JOBSTATUS_DONE);
+                var_dump("Update db-record for file table");
+                $DB->update_record('files', $job);
                 if ($displaytrace) {
                     mtrace('created file id ' . $outputfile->get_id());
                     var_dump("outputfile is stored ");
