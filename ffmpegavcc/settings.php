@@ -63,3 +63,10 @@ $settings->add(new admin_setting_configcheckbox(
     true,
     false
 ));
+
+$settings->add(new admin_setting_configcheckbox(
+    'filter_ffmpegavcc/deleteoriginalfiles',
+    get_string('deleteoriginalfiles', 'filter_ffmpegavcc'),
+    get_string('deleteoriginalfiles_desc', 'filter_ffmpegavcc'),
+    false)
+);
