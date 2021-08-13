@@ -16,15 +16,15 @@ This filter extends the original functionality in a way that `audio` elements ar
 
 A running ffmpeg-conversion-webservice and its url to be set in plugin settings.
 
-Enter the url of your webservice when requested:
-
-
-
 ## Installation
 
 You need to at least:
 
 1. set the `ffmpegwebserviceurl` in the plugin settings.
+
+![plugin configuration screen](../resources/plugin-configuration.png)
+
+You can also specify the file-extensions that should be converted by the filter.
 
 Optionally you can:
 
