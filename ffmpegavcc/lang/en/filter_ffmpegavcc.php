@@ -38,3 +38,5 @@ $string['privacy:metadata'] = 'The ffmpegavcc - Compatibility Filter does not st
 $string['test_ffmpegws'] = 'Test Connection to Ffmpeg-Webservice';
 $string['test_ffmpeg_connection_ok'] = 'The webservice seems to be correctly configured and ready.';
 $string['test_ffmpeg_connection_error'] = 'The webservice was not reachable or unresponsive when pinging.';
+$string['deleteoriginalfiles'] = 'Delete source files';
+$string['deleteoriginalfiles_desc'] = 'Delete source files and keep only converted files.';

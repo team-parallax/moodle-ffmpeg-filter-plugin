@@ -213,8 +213,9 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
                 unlink($tmpoutputfilepath); // not needed anymore, since we just stored the converted outfile
                 var_dump("Update db-record for conversion");
                 update_job_and_record($job, FILTER_FFMPEGAVCC_JOBSTATUS_DONE);
-                var_dump("Update db-record for file table");
-                $DB->update_record('files', $job);
+                if (get_config('filter_ffmpegavcc', 'deleteoriginalfiles') == true) {
+                    $inputfile->delete();
+                }
                 if ($displaytrace) {
                     mtrace('created file id ' . $outputfile->get_id());
                     var_dump("outputfile is stored ");

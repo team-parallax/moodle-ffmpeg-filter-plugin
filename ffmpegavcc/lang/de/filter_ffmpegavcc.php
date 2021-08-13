@@ -38,3 +38,5 @@ $string['privacy:metadata'] = 'Der ffmpegavcc - Kompatibilitätsfilter speichert
 $string['test_ffmpegws'] = 'Testen Sie die Verbindung zum Ffmpeg-Webservice';
 $string['test_ffmpeg_connection_ok'] = 'Der Webservice ist erreichbar und bereit.';
 $string['test_ffmpeg_connection_error'] = 'Der Webservice hat auf den "Ping" nicht reagiert oder ist nicht erreichbar.';
+$string['deleteoriginalfiles'] = 'Original Dateien löschen';
+$string['deleteoriginalfiles_desc'] = 'Löscht Originale der Dateien und behält nur konvertierte Resultate der Dateien.';
