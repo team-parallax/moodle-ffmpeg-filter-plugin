@@ -70,7 +70,7 @@ class curl_handler
         }
         curl_close($ch);
         if ($raw) {
-            return $result;
+            return $response;
         }
         $result = utf8_encode($response);
         return json_decode($result);

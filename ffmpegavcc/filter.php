@@ -155,7 +155,6 @@ function filter_ffmpegavcc_checksources($matches)
     if (is_null($outputfile) && get_config('filter_ffmpegavcc', 'convert' . $type)) {
         global $DB;
         $existingjob = $DB->get_record('filter_ffmpegavcc_jobs', ['fileid' => $inputfile->get_id()]);
-        var_dump($existingjob);
         // first make sure there's not yet a job planned for this file
 
         if (!$existingjob) {
@@ -164,10 +163,7 @@ function filter_ffmpegavcc_checksources($matches)
                 'fileid' => $inputfile->get_id(),
                 'status' => FILTER_FFMPEGAVCC_JOBSTATUS_INITIAL
             ];
-            var_dump($job);
             $jobid = $DB->insert_record('filter_ffmpegavcc_jobs', $job);
-            var_dump($jobid);
-
             if ($type == 'audio') {
                 // process audio jobs immediately
                 \filter_ffmpegavcc_processjobs($jobid, false);

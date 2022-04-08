@@ -89,8 +89,6 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
             var_dump($jobs);
         }
     }
-    var_dump("BEFORE WHILE LOOP $jobs");
-    var_dump($jobs);
     // As long as there are jobs we process one at a time
     while ($job = array_shift($jobs)) {
         if (!$job) {
@@ -101,7 +99,6 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
         }
         $fs = get_file_storage();
         $inputfile = $fs->get_file_by_id($job->fileid);
-        var_dump("before inputfile check");
         if (!$inputfile) {
             update_job_and_record($job, FILTER_FFMPEGAVCC_JOBSTATUS_FAILED);
             if ($displaytrace) {
@@ -109,13 +106,11 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
             }
             return;
         }
-        var_dump("File loaded");
         // create temp directory for data storage during conversion
         $filename = $inputfile->get_filename();
         $outname = get_outputfile_name($filename);
         $source_format = pathinfo($filename, PATHINFO_EXTENSION);
         $target_format = pathinfo($outname, PATHINFO_EXTENSION);
-        var_dump("Create temp dir to save file");
         $tempdir = make_temp_directory('filter_ffmpegavcc');
         // $filename = "$tempdir/" . $inputfile->get_id() . ".$source_format";
         try {
@@ -133,10 +128,7 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
         $tmpinputfilepath = $inputfile->copy_content_to_temp('filter_ffmpegavcc');
         // $filepath = $inputfile->get_filepath();
 
-        var_dump("File path: $tmpinputfilepath");
         // Retrieve relevant info for API
-        var_dump($outname);
-        var_dump("Conversion from: \t$source_format\nto: \t$target_format");
         // retrieve file conversion status from the webservice to check if it is already converted.
         if ($job->status == FILTER_FFMPEGAVCC_JOBSTATUS_INITIAL) {
             // to make sure we don't try to run the same job twice
@@ -149,8 +141,6 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
                 "originalFormat" => $source_format,
                 "targetFormat" => $target_format
             ];
-            var_dump("Requesting conversion with body:\n ");
-            var_dump($req_body);
             $conversion_response = Utility::start_conversion($req_body);
             $conversion_id = $conversion_response->conversionId;
             var_dump("Setting conversionid of job to $conversion_id");
