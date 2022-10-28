@@ -253,7 +253,7 @@ function get_outputfile_name($inputfile)
     return $infile_name;
 }
 
-function stringEndsWith($string, $endString)
+function stringEndsWith($string, $endString): bool
 {
     $len = strlen($endString);
     if ($len == 0) {

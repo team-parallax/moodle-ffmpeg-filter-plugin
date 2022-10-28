@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 20220328307;
+$plugin->version = 20221013307;
 $plugin->requires = 2019052000; // Moodle 3.7
 $plugin->component = 'filter_ffmpegavcc';
 
