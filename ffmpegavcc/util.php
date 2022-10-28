@@ -31,7 +31,7 @@ class Utility
     /**
      * Retrieve the current status of a conversion
      * 
-     * @param $conversion_id    The uuid of the conversion document
+     * @param string $conversion_id     The uuid of the conversion document
      * @return mixed
      */
     static function get_conversion_status(string $conversion_id)
@@ -40,8 +40,7 @@ class Utility
         var_dump("Request conversion status of $conversion_id");
         $url = Utility::get_webservice_route("conversion/$conversion_id?v2=true");
         var_dump("Requesting route: $url");
-        $response = curl_handler::fetch_url_data($url);
-        return $response;
+        return curl_handler::fetch_url_data($url);
     }
     static function get_converted_file($response, $target_path)
     {
@@ -58,7 +57,7 @@ class Utility
      *
      * @return string   The url for an endpoint of the webservice
      */
-    static function get_ffmpeg_webservice_url()
+    static function get_ffmpeg_webservice_url(): string
     {
         Utility::log_to_file("Retrieve webserivce url from configuration");
         $ffmpegwebservice_url = get_config('filter_ffmpegavcc', 'ffmpegwebserviceurl');
@@ -72,16 +71,19 @@ class Utility
     /**
      * Returns an aggregated path consisting of the base url of the webservice and a path
      * 
-     * @param $path     The path for the request url
+     * @param string $path      The path for the request url
+     * @return string
      */
-    static function get_webservice_route(string $path)
+    static function get_webservice_route(string $path): string
     {
-        return Utility::get_ffmpeg_webservice_url() . $path;
+        $return_this = Utility::get_ffmpeg_webservice_url() . $path;
+        Utility::log_to_file("return this: " . $return_this);
+        return $return_this;
     }
     /**
      * Handles a conversion-status response from the webservice
      * 
-     * @param $response     The response object returned from the webservice
+     * @param mixed $response   The response object returned from the webservice
      */
     static function handle_conversion_status_response($response)
     {
@@ -97,17 +99,19 @@ class Utility
     /**
      * Utility function to log plugin processes and operations
      * 
-     * @param $msg      The message to log
+     * @param string $msg   The message to log
      */
-    static function log_to_file($msg)
+    static function log_to_file(string $msg)
     {
         $log = gmdate('H:i:s', time()) . ": " . var_export($msg, true);
         file_put_contents("/tmp/ffmpegavccfilter.log", $log . PHP_EOL, FILE_APPEND | LOCK_EX);
     }
     /**
      * Sends a 'ping' message to the ffmpeg-webservice to determine if the plugin can be used
+     * 
+     * @return string
      */
-    static function ping_webservice()
+    static function ping_webservice(): string
     {
         $url = Utility::get_webservice_route("ping");
         Utility::log_to_file("Send ping to the ffmpeg Webservice\n" . $url);
@@ -117,7 +121,7 @@ class Utility
     }
     /**
      * Sends the data needed for conversion to the Webservice.
-     * @param data  The conversion request body
+     * @param mixed $data   The conversion request body
      * @return mixed The response object from the web-api
      */
     static function start_conversion($data)
