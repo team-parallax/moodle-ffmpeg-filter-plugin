@@ -109,9 +109,9 @@ class Utility
     /**
      * Sends a 'ping' message to the ffmpeg-webservice to determine if the plugin can be used
      * 
-     * @return string
+     * @return bool
      */
-    static function ping_webservice(): string
+    static function ping_webservice(): bool
     {
         $url = Utility::get_webservice_route("ping");
         Utility::log_to_file("Send ping to the ffmpeg Webservice\n" . $url);
