@@ -163,7 +163,7 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
                 }
                 $tmpoutputfilepath = $tempdir . DIRECTORY_SEPARATOR . $outname;
                 Utility::log_var_dump($displaytrace,"fetch result file");
-                $response = Utility::get_converted_file($response, $tmpoutputfilepath, $displaytrace);
+                $response = Utility::get_converted_file($response, $tmpoutputfilepath);
                 Utility::log_var_dump($displaytrace,"Prepare job-record update");
                 if (!file_exists($tmpoutputfilepath) || !is_readable($tmpoutputfilepath)) {
                     Utility::log_var_dump($displaytrace,"File not found: $tmpoutputfilepath");
