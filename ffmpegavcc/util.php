@@ -34,13 +34,18 @@ class Utility
      * @param string $conversion_id     The uuid of the conversion document
      * @return mixed
      */
-    static function get_conversion_status(string $conversion_id)
+    static function get_conversion_status(string $conversion_id, bool $displaytrace)
     {
         Utility::log_to_file("Request conversion status of $conversion_id");
-        var_dump("Request conversion status of $conversion_id");
+        if ($displaytrace) {
+            var_dump("Request conversion status of $conversion_id");
+        }
         $url = Utility::get_webservice_route("conversion/$conversion_id?v2=true");
-        var_dump("Requesting route: $url");
-        return curl_handler::fetch_url_data($url);
+        if ($displaytrace){
+            var_dump("Requesting route: $url");
+        }
+        $response = curl_handler::fetch_url_data($url);
+        return $response;
     }
     static function get_converted_file($response, $target_path)
     {
@@ -76,9 +81,7 @@ class Utility
      */
     static function get_webservice_route(string $path): string
     {
-        $return_this = Utility::get_ffmpeg_webservice_url() . $path;
-        Utility::log_to_file("return this: " . $return_this);
-        return $return_this;
+        return Utility::get_ffmpeg_webservice_url() . $path;
     }
     /**
      * Handles a conversion-status response from the webservice
@@ -135,5 +138,11 @@ class Utility
         $response = curl_handler::convert_to_file($url, $data);
         Utility::log_to_file('Received Response');
         return $response;
+    }
+    static function log_var_dump(bool $displaytrace, string $message)
+    {
+        if ($displaytrace) {
+            var_dump($message);
+        }
     }
 }

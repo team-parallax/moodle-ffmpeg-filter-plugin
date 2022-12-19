@@ -46,7 +46,7 @@ define('FILTER_FFMPEGAVCC_JOBSTATUS_FAILED', 3);
 function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace = true)
 {
     $ffmpegwebserviceurl = get_config('filter_ffmpegavcc', 'ffmpegwebserviceurl');
-    var_dump("FFMPEG_WEBSERVICE_URL: $ffmpegwebserviceurl");
+    Utility::log_var_dump($displaytrace,"FFMPEG_WEBSERVICE_URL: $ffmpegwebserviceurl");
     if (empty($ffmpegwebserviceurl)) {
         // show error and exit if no url is provided
         if ($displaytrace) {
@@ -132,7 +132,7 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
         // retrieve file conversion status from the webservice to check if it is already converted.
         if ($job->status == FILTER_FFMPEGAVCC_JOBSTATUS_INITIAL) {
             // to make sure we don't try to run the same job twice
-            var_dump("Prepare conversion for jobid: $jobid");
+            Utility::log_var_dump($displaytrace,"Prepare conversion for jobid: $jobid");
             // $conversionfile = "@" . $filename;
             // var_dump("Conversion-File BEFORE cURLify: $conversionfile");
             $conversionfile = new CURLFile($tmpinputfilepath);
@@ -143,9 +143,9 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
             ];
             $conversion_response = Utility::start_conversion($req_body);
             $conversion_id = $conversion_response->conversionId;
-            var_dump("Setting conversionid of job to $conversion_id");
+            Utility::log_var_dump($displaytrace,"Setting conversionid of job to $conversion_id");
             $job->conversionid = $conversion_id;
-            var_dump("Set jobstatus to running");
+            Utility::log_var_dump($displaytrace,"Set jobstatus to running");
             update_job_and_record($job, FILTER_FFMPEGAVCC_JOBSTATUS_RUNNING);
             // we're done for now and wait for the conversion to terminate within the webservice.
             return;
@@ -153,18 +153,20 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
             // TODO: In case the result is 'converted' fetch the resultfile,
             // update the job-record and write output.
             $conversionId = $job->conversionid;
-            $response = Utility::get_conversion_status($conversionId);
-            var_dump("got response from webservice for conversion($conversionId)");
+            $response = Utility::get_conversion_status($conversionId, $displaytrace);
+            Utility::log_var_dump($displaytrace, "got response from webservice for conversion($conversionId)");
             if ($response->status == "converted") {
-                var_dump("handle conversion-success");
-                // Handles conversion success
-                var_dump("Outfile name is $outname");
+                if ($displaytrace){
+                    var_dump("handle conversion-success");
+                    // Handles conversion success
+                    var_dump("Outfile name is $outname");
+                }
                 $tmpoutputfilepath = $tempdir . DIRECTORY_SEPARATOR . $outname;
-                var_dump("fetch result file");
-                $response = Utility::get_converted_file($response, $tmpoutputfilepath);
-                var_dump("Prepare job-record update");
+                Utility::log_var_dump($displaytrace,"fetch result file");
+                $response = Utility::get_converted_file($response, $tmpoutputfilepath, $displaytrace);
+                Utility::log_var_dump($displaytrace,"Prepare job-record update");
                 if (!file_exists($tmpoutputfilepath) || !is_readable($tmpoutputfilepath)) {
-                    var_dump("File not found: $tmpoutputfilepath");
+                    Utility::log_var_dump($displaytrace,"File not found: $tmpoutputfilepath");
                     update_job_and_record($job, FILTER_FFMPEGAVCC_JOBSTATUS_FAILED);
                     if ($displaytrace) {
                         mtrace('output file not found');
@@ -189,19 +191,19 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
                     'timemodified' => time()
                 ];
                 try {
-                    var_dump("Write output for conversion to file $tmpoutputfilepath");
+                    Utility::log_var_dump($displaytrace,"Write output for conversion to file $tmpoutputfilepath");
                     $outputfile = $fs->create_file_from_pathname($outputfile_properties, $tmpoutputfilepath);
                 } catch (Exception $exception) {
-                    var_dump("Failed to write conversion output to disk");
+                    Utility::log_var_dump($displaytrace,"Failed to write conversion output to disk");
                     update_job_and_record($job, FILTER_FFMPEGAVCC_JOBSTATUS_FAILED);
                     if ($displaytrace) {
                         mtrace('file could not be saved: ' . $exception->getMessage());
                     }
                     return;
                 }
-                var_dump("Conversion successful for $jobid, deleting tmp-file");
+                Utility::log_var_dump($displaytrace,"Conversion successful for $jobid, deleting tmp-file");
                 unlink($tmpoutputfilepath); // not needed anymore, since we just stored the converted outfile
-                var_dump("Update db-record for conversion");
+                Utility::log_var_dump($displaytrace,"Update db-record for conversion");
                 update_job_and_record($job, FILTER_FFMPEGAVCC_JOBSTATUS_DONE);
                 if (get_config('filter_ffmpegavcc', 'deleteoriginalfiles') == true) {
                     $inputfile->delete();
@@ -213,7 +215,7 @@ function filter_ffmpegavcc_processjobs(?int $jobid = null, ?bool $displaytrace =
                 }
                 return;
             } else if ($response->status == "erroneous") {
-                var_dump("Update db-record for conversion");
+                Utility::log_var_dump($displaytrace,"Update db-record for conversion");
                 update_job_and_record($job, FILTER_FFMPEGAVCC_JOBSTATUS_FAILED);
                 if ($displaytrace) {
                     mtrace('failed to convert file.');
