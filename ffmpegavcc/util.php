@@ -44,8 +44,7 @@ class Utility
         if ($displaytrace){
             var_dump("Requesting route: $url");
         }
-        $response = curl_handler::fetch_url_data($url);
-        return $response;
+        return curl_handler::fetch_url_data($url);
     }
     static function get_converted_file($response, $target_path)
     {
