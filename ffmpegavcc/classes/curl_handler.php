@@ -18,17 +18,17 @@ class curl_handler
 {
     public static function convert_to_file($url, $data)
     {
-        Utility::log_to_file("conversion function l. 1");
+        Utility::log_to_moodle("conversion function l. 1");
         if (!$url || !is_string($url)) {
             return false;
         }
-        Utility::log_to_file("Init curl handler");
+        Utility::log_to_moodle("Init curl handler");
         $ch = curl_init($url);
         if ($ch === false) {
-            Utility::log_to_file("$url not found.");
+            Utility::log_to_moodle("$url not found.");
             return false;
         }
-        Utility::log_to_file("CONFIGURING CURL");
+        Utility::log_to_moodle("CONFIGURING CURL");
         $ch = (new curl_handler)->configure_curl_session($ch);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -36,12 +36,12 @@ class curl_handler
             'accept: application/json',
             'Content-Type: multipart/form-data'
         ));
-        Utility::log_to_file("SET POST FIELDS");
+        Utility::log_to_moodle("SET POST FIELDS");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         // var_dump("DATA FOR REQ: \n$data");
         $response = curl_exec($ch);
-        Utility::log_to_file("Response from webservice is");
-        Utility::log_to_file($response);
+        Utility::log_to_moodle("Response from webservice is");
+        Utility::log_to_moodle($response);
         $err = curl_errno($ch);
         if ($err) {
             curl_close($ch);

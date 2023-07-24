@@ -40,7 +40,7 @@ class Utility
      */
     static function get_conversion_status(string $conversion_id, bool $displaytrace)
     {
-        Utility::log_to_file("Request conversion status of $conversion_id");
+        Utility::log_to_moodle("Request conversion status of $conversion_id");
         if ($displaytrace) {
             var_dump("Request conversion status of $conversion_id");
         }
@@ -53,7 +53,7 @@ class Utility
     static function get_converted_file($response, $target_path)
     {
         $conversion_id = $response->conversionId;
-        Utility::log_to_file("Request converted file for id $conversion_id");
+        Utility::log_to_moodle("Request converted file for id $conversion_id");
         $url = Utility::get_webservice_route("conversion/$conversion_id/download");
         $file_response = curl_handler::download_file($url, $target_path);
         // file_put_contents("./response.mp4", $file_response);
@@ -67,13 +67,13 @@ class Utility
      */
     static function get_ffmpeg_webservice_url(): string
     {
-        Utility::log_to_file("Retrieve webserivce url from configuration");
+        Utility::log_to_moodle("Retrieve webserivce url from configuration");
         $ffmpegwebservice_url = get_config('filter_ffmpegavcc', 'ffmpegwebserviceurl');
 
         if (substr($ffmpegwebservice_url, -1) !== '/') {
             $ffmpegwebservice_url .= '/';
         }
-        Utility::log_to_file("URL: $ffmpegwebservice_url");
+        Utility::log_to_moodle("URL: $ffmpegwebservice_url");
         return $ffmpegwebservice_url;
     }
     /**
@@ -93,11 +93,11 @@ class Utility
      */
     static function handle_conversion_status_response($response)
     {
-        Utility::log_to_file("Handle conversion status response for id: " . $response->conversionId);
+        Utility::log_to_moodle("Handle conversion status response for id: " . $response->conversionId);
         $result = $response;
         if ($response->status == "converted") {
             // TODO: Handle converted object
-            Utility::log_to_file("Handle 'converted' response");
+            Utility::log_to_moodle("Handle 'converted' response");
             $result = Utility::get_converted_file($response);
         }
         return $result;
@@ -107,7 +107,7 @@ class Utility
      * 
      * @param mixed $msg   The message to log
      */
-    static function log_to_file(mixed $msg)
+    static function log_to_moodle(mixed $msg)
     {
 //        $log = gmdate('H:i:s', time()) . ": " . var_export($msg, true);
 //        file_put_contents("/tmp/ffmpegavccfilter.log", $log . PHP_EOL, FILE_APPEND | LOCK_EX);
@@ -127,9 +127,9 @@ class Utility
     static function ping_webservice(): bool
     {
         $url = Utility::get_webservice_route("ping");
-        Utility::log_to_file("Send ping to the ffmpeg Webservice\n" . $url);
+        Utility::log_to_moodle("Send ping to the ffmpeg Webservice\n" . $url);
         $response = curl_handler::fetch_url_data($url, true);
-        Utility::log_to_file("Got response " . $response);
+        Utility::log_to_moodle("Got response " . $response);
         return $response == "\"pong\"";
     }
     /**
@@ -139,15 +139,15 @@ class Utility
      */
     static function start_conversion($data)
     {
-        Utility::log_to_file('Send conversion request to Webservice');
+        Utility::log_to_moodle('Send conversion request to Webservice');
         $url = Utility::get_webservice_route('conversion/v2');
-        Utility::log_to_file("Sending request to following url: $url");
-        // Utility::log_to_file($data);
+        Utility::log_to_moodle("Sending request to following url: $url");
+        // Utility::log_to_moodle($data);
         $response_ping = Utility::ping_webservice();
-        Utility::log_to_file($response_ping);
+        Utility::log_to_moodle($response_ping);
         $response = curl_handler::convert_to_file($url, $data);
-        Utility::log_to_file($response);
-        Utility::log_to_file('Received Response');
+        Utility::log_to_moodle($response);
+        Utility::log_to_moodle('Received Response');
         return $response;
     }
     static function log_var_dump(bool $displaytrace, string $message)
