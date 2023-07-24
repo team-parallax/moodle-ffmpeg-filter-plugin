@@ -23,8 +23,12 @@
  */
 
 namespace filter_ffmpegavcc\util;
+require_once('event.php');
+//require_once($CFG->dirroot . '/filter/ffmpegavcc/event.php');
+
 
 use \filter_ffmpegavcc\curl_handler;
+use \filter_ffmpegavcc\event\log_event;
 
 class Utility
 {
@@ -101,12 +105,19 @@ class Utility
     /**
      * Utility function to log plugin processes and operations
      * 
-     * @param string $msg   The message to log
+     * @param mixed $msg   The message to log
      */
-    static function log_to_file(string $msg)
+    static function log_to_file(mixed $msg)
     {
-        $log = gmdate('H:i:s', time()) . ": " . var_export($msg, true);
-        file_put_contents("/tmp/ffmpegavccfilter.log", $log . PHP_EOL, FILE_APPEND | LOCK_EX);
+//        $log = gmdate('H:i:s', time()) . ": " . var_export($msg, true);
+//        file_put_contents("/tmp/ffmpegavccfilter.log", $log . PHP_EOL, FILE_APPEND | LOCK_EX);
+        $event = log_event::create(array(
+           "other" => array(
+               "dump" => var_export($msg, true)
+           ),
+            'context' => \context_system::instance(),
+        ));
+        $event->trigger();
     }
     /**
      * Sends a 'ping' message to the ffmpeg-webservice to determine if the plugin can be used
@@ -135,6 +146,7 @@ class Utility
         $response_ping = Utility::ping_webservice();
         Utility::log_to_file($response_ping);
         $response = curl_handler::convert_to_file($url, $data);
+        Utility::log_to_file($response);
         Utility::log_to_file('Received Response');
         return $response;
     }

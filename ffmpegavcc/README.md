@@ -30,6 +30,7 @@ A running ffmpeg-conversion-webservice and its url to be set in plugin settings.
 5. Click the `Install plugin from the ZIP file` button and click `Continue`/`Upgrade Moodle database now` until you reach the settings page
 6. Adapt the plugin settings to your liking [Make sure to at least set the `Ffmpeg-Webservice URL`]
 ![plugin configuration screen](../resources/ffmpegavcc-settings.png)
+   (use `http://172.17.0.1:3000` if you run a local docker image of the conversion service)
 Optionally you can:
    * specify the file-extensions that should be converted by the filter
    * choose whether to convert audio or video files
@@ -39,3 +40,11 @@ Optionally you can:
 8. Activate the `ffmpegavcc - Compatibility Filter` and move it to the top via the arrow buttons
 9. Optionally: Head to the `Settings` of the `ffmpegavcc - Compatibility Filter` and click `Test Connection to Ffmpeg-Webservice` to make sure that the connection to the webservice is working as intended
 [Hint: Here you may also change the settings you made in the installation step earlier]
+
+## Usage
+0. have a conversion service at your hand: `https://github.com/team-parallax/dynamic-conversion-service/`
+1. enable crons here: `http://localhost:8080/admin/settings.php?section=sitepolicies` and set `Cron execution via command line only` to `false`.
+2. create a new post with videos/audios in it (see our example files)
+3. then we curl it like so `curl 'http://localhost:8080/admin/cron.php?password=opensesame'` (if the password you've set is `opensesame`)
+4. wait until conversion is finished
+5. observe the added source of the audio/video html tag
