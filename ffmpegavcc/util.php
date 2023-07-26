@@ -107,10 +107,8 @@ class Utility
      * 
      * @param mixed $msg   The message to log
      */
-    static function log_to_moodle(mixed $msg)
+    static function log_to_moodle($msg)
     {
-//        $log = gmdate('H:i:s', time()) . ": " . var_export($msg, true);
-//        file_put_contents("/tmp/ffmpegavccfilter.log", $log . PHP_EOL, FILE_APPEND | LOCK_EX);
         $event = log_event::create(array(
            "other" => array(
                "dump" => var_export($msg, true)
@@ -150,10 +148,10 @@ class Utility
         Utility::log_to_moodle('Received Response');
         return $response;
     }
-    static function log_var_dump(bool $displaytrace, string $message)
+    static function log_var_dump(bool $displaytrace, $message)
     {
         if ($displaytrace) {
-            var_dump($message);
+            Utility::log_to_moodle($message);
         }
     }
 }

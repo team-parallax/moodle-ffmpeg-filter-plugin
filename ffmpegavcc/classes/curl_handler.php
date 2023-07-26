@@ -26,6 +26,7 @@ class curl_handler
         $ch = curl_init($url);
         if ($ch === false) {
             Utility::log_to_moodle("$url not found.");
+            Utility::log_to_moodle(curl_errno($ch) . " " . curl_error($ch));
             return false;
         }
         Utility::log_to_moodle("CONFIGURING CURL");
@@ -44,6 +45,7 @@ class curl_handler
         Utility::log_to_moodle($response);
         $err = curl_errno($ch);
         if ($err) {
+            Utility::log_to_moodle($err . " " . curl_error($ch));
             curl_close($ch);
             return false;
         }
@@ -65,6 +67,7 @@ class curl_handler
         $response = curl_exec($ch);
         $err = curl_errno($ch);
         if ($err) {
+            Utility::log_to_moodle($err . " " . curl_error($ch));
             curl_close($ch);
             return false;
         }
@@ -89,7 +92,9 @@ class curl_handler
         curl_exec($ch);
         $err = curl_errno($ch);
         if ($err) {
+            Utility::log_to_moodle($err . " " . curl_error($ch));
             curl_close($ch);
+            fclose($fh);
             return false;
         }
         curl_close($ch);
@@ -110,7 +115,8 @@ class curl_handler
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_exec($ch);
         $err = curl_errno($ch);
-        if ($err) {   // should be 0
+        if ($err) {
+            Utility::log_to_moodle($err . " " . curl_error($ch));
             curl_close($ch);
             return false;
         }

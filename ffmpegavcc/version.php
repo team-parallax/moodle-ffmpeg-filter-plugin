@@ -25,7 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 20221219307;
+/**
+ * May be generated like so: `date +"%Y%m%d"000`
+ * We accidentally pushed an additional number to the version like so:
+ * `YYYYMMDDXXX` (it should be `YYYYMMDDXX`) - I dont want to decrease the number because we dont want to lower
+ * the version number, so we are going with it.
+ */
+$plugin->version = 20230726000;
 $plugin->requires = 2019052000; // Moodle 3.7
 $plugin->component = 'filter_ffmpegavcc';
 
