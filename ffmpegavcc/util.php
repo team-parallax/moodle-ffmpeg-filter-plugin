@@ -23,8 +23,7 @@
  */
 
 namespace filter_ffmpegavcc\util;
-require_once('event.php');
-//require_once($CFG->dirroot . '/filter/ffmpegavcc/event.php');
+require_once($CFG->dirroot . '/filter/ffmpegavcc/event.php');
 
 
 use \filter_ffmpegavcc\curl_handler;
